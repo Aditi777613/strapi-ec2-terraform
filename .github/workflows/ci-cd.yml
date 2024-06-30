@@ -1,4 +1,4 @@
-name: Deploy Strapi to EC2
+name: Deploy to EC2
 
 on:
   push:
@@ -10,22 +10,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build Strapi
-        run: npm run build
-
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            cd /home/ubuntu/strapi-project
-            npm install
-            npm run develop
+    - name: Deploy to EC2
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          cd /srv/strapi
+          git pull origin main
+          npm install
+          pm2 restart strapi
